@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hitl-refund-config
+  namespace: hitl-refund
+data:
+  OPENROUTER_MODEL: "openai/gpt-4o-mini"
+  OPENROUTER_BASE_URL: "https://openrouter.ai/api/v1"
+
+  STORAGE_BACKEND: "memory"
+  AUDIT_BACKEND: "memory"
+
+  COSMOS_ENDPOINT: "https://localhost:8081/"
+  COSMOS_DATABASE: "hitl-refund-demo"
+  COSMOS_CONTAINER: "workflow-records"
+  COSMOS_VERIFY_SSL: "true"
+
+  DATABASE_URL: "postgresql://hitl_user:hitl_password@localhost:5434/hitl_audit"
+
+  LANGFUSE_HOST: "https://cloud.langfuse.com"

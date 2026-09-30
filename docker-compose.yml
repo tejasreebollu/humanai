@@ -1,55 +1,19 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: hitl_audit
-      POSTGRES_USER: hitl_user
-      POSTGRES_PASSWORD: hitl_password
-    ports:
-      - "5434:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hitl_user -d hitl_audit"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    volumes:
-      - postgres_audit_data:/var/lib/postgresql/data
-  cosmos:
-    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-latest
-    environment:
-      PORT: 18082
-      PROTOCOL: http
-      ENABLE_EXPLORER: "true"
-      EXPLORER_PORT: 11234
-      EXPLORER_PROTOCOL: http
-    ports:
-      - "18082:18082"
-      - "11234:11234"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18082/"]
-      interval: 15s
-      timeout: 10s
-      retries: 20
-    volumes:
-      - cosmos_vnext_data:/data
-  app:
-    build: .
-    profiles: ["full"]
-    env_file: .env
-    environment:
-      STORAGE_BACKEND: cosmos
-      COSMOS_ENDPOINT: http://cosmos:18082/
-      COSMOS_VERIFY_SSL: "true"
-      AUDIT_BACKEND: postgres
-      DATABASE_URL: postgresql://hitl_user:hitl_password@postgres:5432/hitl_audit
+  hitl-refund:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: hitl-refund-agent
+
     ports:
       - "8501:8501"
-    depends_on:
-      cosmos:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
 
-volumes:
-  cosmos_vnext_data:
-  postgres_audit_data:
+    env_file:
+      - .env
+
+    environment:
+      STORAGE_BACKEND: memory
+      AUDIT_BACKEND: memory
+
+    restart: unless-stopped

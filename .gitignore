@@ -1,0 +1,4 @@
+.env
+k8s/secret.yml
+__pycache__/
+*.pyc

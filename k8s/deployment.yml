@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hitl-refund-agent
+  namespace: hitl-refund
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: hitl-refund-agent
+
+  template:
+    metadata:
+      labels:
+        app: hitl-refund-agent
+
+    spec:
+      containers:
+        - name: hitl-refund-agent
+
+          image: hitl-refund-agent:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8501
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: hitl-refund-config
+            - secretRef:
+                name: hitl-refund-secrets
+
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8501
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3

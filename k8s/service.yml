@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hitl-refund-service
+  namespace: hitl-refund
+spec:
+  type: LoadBalancer
+
+  selector:
+    app: hitl-refund-agent
+
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8501
